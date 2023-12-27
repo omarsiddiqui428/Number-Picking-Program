@@ -1,6 +1,7 @@
 # Number Picking Program
 
 #TODO- handle incorrect inputs 
+#TODO- have the AI factor in the players guess to it's list of numbers not to guess 
 
 #Imports
 import random

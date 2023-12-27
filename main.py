@@ -1,5 +1,7 @@
 # Number Picking Program
 
+#TODO- handle incorrect inputs 
+
 #Imports
 import random
 from random import choice

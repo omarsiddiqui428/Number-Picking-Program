@@ -1,77 +1,93 @@
-# Number Picking Program
+#number guessing game
+#AI player uses binary strategy 
 
-#TODO- handle incorrect inputs 
-#TODO- have the AI factor in the players guess to it's list of numbers not to guess 
-
-#Imports
 import random
-from random import choice
-
-#Variables
 
 #Functions
 def generate_random_number(upper_limit):
     random_number = random.randint(0, upper_limit)
     return random_number
 
-def generate_random_ai_guess(upper_limit,guessed_list):
-    random_guess = choice([i for i in range(0, upper_limit) if i not in guessed_list])
-    return random_guess
+def guess_feedback(guess,random_number):
+    if guess == random_number:
+        return "correct"
+    elif guess > random_number:
+        return "too high"
+    elif guess < random_number:
+        return "too low"
 
-def check_guess(guess,random_number,turn): #should return #don't have side effects here
-    if turn == "ai":
-        if guess == random_number:
-            return "correct"
-        else:
-            return "incorrect"
-    if turn == "human":
-        if guess == random_number:
-            return "correct"
-        else:
-            return "incorrect"
+def generate_ai_guess(lower_limit,upper_limit):
+    guess = (lower_limit+ upper_limit) // 2
+    return guess
 
-def check_turn(turn):
-    if turn % 2 == 0:
+def game_winner(ai_guess_count,human_guess_count):
+    if ai_guess_count < human_guess_count:
         return "ai"
-    else:
+    if ai_guess_count > human_guess_count:
         return "human"
+    elif ai_guess_count == human_guess_count:
+        return "tie"
 
 def main():
-    #TODO- question, why did my program not work when the variables were before the functions?
-    playing = True
-    complete = False
-    guessed_list = []
-    current_turn = 0
-    upper_limit = 100
 
-    print("\nWelcome to the guessing game. Your challenge is to guess the random number (from 0-" + str(upper_limit) + ") before the AI does.")
-    print("The random number has been chosen. You get first guess.")
-    correct_number = generate_random_number(upper_limit)
+    human_playing = True
+    human_turn_complete = False
+    initial_max = 100
+    human_guess_count = 0
+    ai_guess_count = 0
+    ai_turn_complete = False
+    ai_playing = True
 
-    while playing:
-        current_turn = current_turn + 1
-        if check_turn(current_turn) == "ai":
-            ai_guess = generate_random_ai_guess(upper_limit,guessed_list)
-            guessed_list.append(ai_guess)
-            if check_guess(ai_guess,correct_number,check_turn(current_turn)) == "correct":
-                print("\nAi turn- the Ai correctly guessed the number " + str(correct_number) + ". You lost :(")
-                playing = False
-                complete = True
-            else:
-                print("\nAi turn- the Ai guessed " + str(ai_guess) + " which was incorrect")
-                #should go back to beginning of loop
+    print("\nWelcome to the guessing game. Your challenge is to guess the random number from 0-" + str(initial_max) + " in as few guesses as possible.")
+    print("Once you guess, the AI will then try to guess the same number. The player that gets the number in the fewest guesses wins!")
+    print("The random number has been chosen. You go first.")
 
-        if check_turn(current_turn) == "human":
-            human_guess = input("\nYour turn- enter your guess here: ")
-            if check_guess(human_guess, correct_number, check_turn(current_turn)) == "correct":
-                print("You correctly guessed the number " + str(correct_number) + "! You won!")
-                playing = False
-                complete = True
-            else:
-                print("Your guess was incorrect, the number is not " + str(human_guess))
+    correct_number = generate_random_number(initial_max)
 
-    if complete:
-        exit("Game over")
+    while human_playing:
+        human_guess = int(input("\nEnter your guess: "))
+        human_guess_count += 1
+        if guess_feedback(human_guess,correct_number) == "correct":
+            print("\nYou correctly guessed the number!")
+            human_turn_complete = True
+            human_playing = False
+        if guess_feedback(human_guess, correct_number) == "too high":
+            print("your guess was too high")
+        if guess_feedback(human_guess, correct_number) == "too low":
+            print("your guess was too low")
+
+    if human_turn_complete:
+        print("\n\nYour total number of guesses: " + str(human_guess_count))
+        print("\nNow it's the AI's turn to guess.\n")
+        upper_limit = initial_max
+        lower_limit = 0
+
+        while ai_playing:
+            ai_guess = generate_ai_guess(lower_limit,upper_limit)
+            ai_guess_count += 1
+            print("AI guess " + str(ai_guess_count) + ": " + str(ai_guess))
+            if guess_feedback(ai_guess, correct_number) == "correct":
+                print("\nThe AI correctly guessed the number!")
+                ai_turn_complete = True
+                ai_playing = False
+            if guess_feedback(ai_guess, correct_number) == "too high":
+                upper_limit = ai_guess
+                print("The AI's guess was too high")
+            if guess_feedback(ai_guess, correct_number) == "too low":
+                lower_limit = ai_guess
+                print("The AI's guess was too low")
+
+    if ai_turn_complete:
+        print("\nYour total number of guesses to get the correct number: " + str(human_guess_count))
+        print("The AI's total number of guesses to get the correct number: " + str(ai_guess_count))
+        if game_winner(ai_guess_count,human_guess_count) == "ai":
+            print("\nThe AI wins the guessing game!")
+        if game_winner(ai_guess_count,human_guess_count) == "human":
+            print("\nYou win the guessing game!")
+        if game_winner(ai_guess_count, human_guess_count) == "tie":
+            print("\nYou and the AI tie the guessing game!")
+
+    exit("Game over")
 
 if __name__ == "__main__":
     main()

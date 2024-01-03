@@ -45,7 +45,14 @@ def main():
     correct_number = generate_random_number(initial_max)
 
     while human_playing:
-        human_guess = int(input("\nEnter your guess: "))
+
+        try: #error handling 
+            human_guess = int(input("\nEnter your guess: ")) 
+
+        except ValueError:
+            print("Your input was not an integer. Please enter a valid integer guess.")
+            continue
+            
         human_guess_count += 1
         if guess_feedback(human_guess,correct_number) == "correct":
             print("\nYou correctly guessed the number!")
